@@ -1,4 +1,4 @@
-## THis is an example of template driven form
+## THis is an example of Reactive form , refactored  from the master branch
 
 
 Import FormsModule to bring in directives listed below
