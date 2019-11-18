@@ -18,9 +18,8 @@
             formControlName="firstName"
             [ngClass]="{
               'is-invalid':
-                customerForm.get('firstName').touched ||
-                (customerForm.get('firstName').dirty &&
-                  customerForm.get('firstName').valid)
+                (customerForm.get('firstName').touched ||customerForm.get('firstName').dirty) &&
+                  !customerForm.get('firstName').valid
             }"
           />
           <span class="invalid-feedback">
@@ -47,9 +46,9 @@
             formControlName="lastName"
             [ngClass]="{
               'is-invalid':
-                customerForm.get('lastName').touched ||
-                (customerForm.get('lastName').dirty &&
-                  !customerForm.get('lastName').valid)
+                (customerForm.get('lastName').touched ||
+                customerForm.get('lastName').dirty) &&
+                  !customerForm.get('lastName').valid
             }"
           />
           <span class="invalid-feedback">
@@ -74,9 +73,9 @@
             placeholder="Email (required)"
             [ngClass]="{
               'is-invalid':
-                customerForm.get('email').touched ||
-                (customerForm.get('email').dirty &&
-                  !customerForm.get('email').valid)
+                (customerForm.get('email').touched ||
+                customerForm.get('email').dirty )&&
+                  !customerForm.get('email').valid
             }"
           />
           <span class="invalid-feedback">
@@ -92,7 +91,7 @@
 
 
       <div class="form-group row mb-2">
-        <label class="col-md-2 col-form-label" for="phoneId">Email</label>
+        <label class="col-md-2 col-form-label" for="phoneId">Phone</label>
         <div class="col-md-8">
           <input
             class="form-control"
@@ -100,7 +99,7 @@
             type="tel"
             formControlName="phone"
             placeholder="Phone"
-            [ngClass]="{'is-invalid':!customerForm.get('email').valid}"
+            [ngClass]="{'is-invalid':!customerForm.get('phone').valid}"
           />
           <span class="invalid-feedback">
             <span *ngIf="customerForm.get('phone').errors?.required">
@@ -272,4 +271,4 @@
 </div>
 <br />Dirty: {{ customerForm.dirty }} <br />Touched: {{ customerForm.touched }}
 <br />Valid: {{ customerForm.valid }} <br />Value:
-{{ customerForm.value | json }}
+{{ customerForm.value | json }} <br/>
