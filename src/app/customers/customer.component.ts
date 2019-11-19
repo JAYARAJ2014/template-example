@@ -13,6 +13,20 @@ function ratingRange(c: AbstractControl): { [key: string]: boolean } | null {
   }
   return null;
 }
+function comareEmailsValidator(
+  c: AbstractControl
+): { [key: string]: boolean } | null {
+  let emailControl = c.get('email');
+  let emailConfirmControl = c.get('confirmEmail');
+
+  if (emailControl.pristine || emailConfirmControl.pristine) {
+    return null;
+  }
+  if (emailControl.value === emailConfirmControl.value) {
+    return null;
+  }
+  return { match: true };
+}
 
 @Component({
   selector: 'app-customer',
@@ -26,15 +40,21 @@ export class CustomerComponent implements OnInit {
   constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit() {
-    this.customerForm = this.formBuilder.group({
-      firstName: ['', [Validators.required, Validators.minLength(3)]],
-      lastName: ['', [Validators.required, Validators.maxLength(50)]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: '',
-      notification: 'email',
-      rating: [null,ratingRange],
-      sendCatalog: true
-    });
+    this.customerForm = this.formBuilder.group(
+      {
+        firstName: ['', [Validators.required, Validators.minLength(3)]],
+        lastName: ['', [Validators.required, Validators.maxLength(50)]],
+        emailGroup: this.formBuilder.group({
+          email: ['', [Validators.required, Validators.email]],
+          confirmEmail: ['', Validators.required]
+        }, { validator: comareEmailsValidator }),
+
+        phone: '',
+        notification: 'email',
+        rating: [null, ratingRange],
+        sendCatalog: true
+      }
+    );
   }
   populateTestData(): void {
     this.customerForm.setValue({
