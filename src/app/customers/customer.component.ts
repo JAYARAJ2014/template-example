@@ -40,21 +40,24 @@ export class CustomerComponent implements OnInit {
   constructor(private formBuilder: FormBuilder) {}
 
   ngOnInit() {
-    this.customerForm = this.formBuilder.group(
-      {
-        firstName: ['', [Validators.required, Validators.minLength(3)]],
-        lastName: ['', [Validators.required, Validators.maxLength(50)]],
-        emailGroup: this.formBuilder.group({
+    this.customerForm = this.formBuilder.group({
+      firstName: ['', [Validators.required, Validators.minLength(3)]],
+      lastName: ['', [Validators.required, Validators.maxLength(50)]],
+      emailGroup: this.formBuilder.group(
+        {
           email: ['', [Validators.required, Validators.email]],
           confirmEmail: ['', Validators.required]
-        }, { validator: comareEmailsValidator }),
+        },
+        { validator: comareEmailsValidator }
+      ),
 
-        phone: '',
-        notification: 'email',
-        rating: [null, ratingRange],
-        sendCatalog: true
-      }
-    );
+      phone: '',
+      notification: 'email',
+      rating: [null, ratingRange],
+      sendCatalog: true
+    });
+
+    this.customerForm.get('notification').valueChanges.subscribe(value => this.setNotification(value));
   }
   populateTestData(): void {
     this.customerForm.setValue({
