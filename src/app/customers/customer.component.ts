@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import {
   FormGroup,
+  FormArray,
   FormBuilder,
   Validators,
   AbstractControl
 } from '@angular/forms';
-import { debounceTime} from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 import { Customer } from './customer';
 
 /* Validator that allow rating only up to 1-5 */
@@ -42,6 +43,9 @@ export class CustomerComponent implements OnInit {
   customer = new Customer();
   emailMessage: string;
 
+  get addresses(): FormArray {
+    return <FormArray>this.customerForm.get('addresses');
+  }
   private validationMessages = {
     required: 'Please enter your email address',
     email: 'Please enter a valid email address'
@@ -64,7 +68,8 @@ export class CustomerComponent implements OnInit {
       phone: '',
       notification: 'email',
       rating: [null, ratingRange],
-      sendCatalog: true
+      sendCatalog: true,
+      addresses: this.formBuilder.array([this.buildAddress()])
     });
 
     this.customerForm
@@ -72,10 +77,21 @@ export class CustomerComponent implements OnInit {
       .valueChanges.subscribe(value => this.setNotification(value));
 
     const emailControl = this.customerForm.get('emailGroup.email');
-    emailControl.valueChanges.pipe(debounceTime(1000)).subscribe(value => this.setMessage(emailControl));
+    emailControl.valueChanges
+      .pipe(debounceTime(1000))
+      .subscribe(value => this.setMessage(emailControl));
 
     // const emailConfirmControl = this.customerForm.get('emailGroup.confirmEmail');
-
+  }
+  buildAddress(): FormGroup {
+    return this.formBuilder.group({
+      addressType: 'home',
+      street1: '',
+      street2: '',
+      city: '',
+      state: '',
+      zip: ''
+    });
   }
   setMessage(c: AbstractControl): void {
     this.emailMessage = '';
@@ -85,13 +101,8 @@ export class CustomerComponent implements OnInit {
         .join(' ');
     }
   }
-  populateTestData(): void {
-    this.customerForm.setValue({
-      firstName: '',
-      lastName: 'Daniels',
-      email: 'jack.daniels@whiskey.com',
-      sendCatalog: true
-    });
+  addAddress(): void {
+    this.addresses.push(this.buildAddress());
   }
   save() {
     console.log(this.customerForm);
