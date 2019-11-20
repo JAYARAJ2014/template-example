@@ -5,24 +5,28 @@ import {
   Validators,
   AbstractControl
 } from '@angular/forms';
+import { debounceTime} from 'rxjs/operators';
 import { Customer } from './customer';
 
+/* Validator that allow rating only up to 1-5 */
 function ratingRange(c: AbstractControl): { [key: string]: boolean } | null {
   if (c.value !== null && (isNaN(c.value) || c.value < 1 || c.value > 5)) {
     return { range: true };
   }
   return null;
 }
-function comareEmailsValidator(
+/** Validator that compares two email address fields */
+function compareEmailsValidator(
   c: AbstractControl
 ): { [key: string]: boolean } | null {
-  let emailControl = c.get('email');
-  let emailConfirmControl = c.get('confirmEmail');
+  const emailControl = c.get('email');
+  const emailConfirmControl = c.get('confirmEmail');
 
-  if (emailControl.pristine || emailConfirmControl.pristine) {
-    return null;
-  }
-  if (emailControl.value === emailConfirmControl.value) {
+  if (
+    emailControl.pristine ||
+    emailConfirmControl.pristine ||
+    emailControl.value === emailConfirmControl.value
+  ) {
     return null;
   }
   return { match: true };
@@ -54,7 +58,7 @@ export class CustomerComponent implements OnInit {
           email: ['', [Validators.required, Validators.email]],
           confirmEmail: ['', Validators.required]
         },
-        { validator: comareEmailsValidator }
+        { validator: compareEmailsValidator }
       ),
 
       phone: '',
@@ -68,14 +72,17 @@ export class CustomerComponent implements OnInit {
       .valueChanges.subscribe(value => this.setNotification(value));
 
     const emailControl = this.customerForm.get('emailGroup.email');
+    emailControl.valueChanges.pipe(debounceTime(1000)).subscribe(value => this.setMessage(emailControl));
 
-    emailControl.valueChanges.subscribe(value => this.setMessage(emailControl));
+    // const emailConfirmControl = this.customerForm.get('emailGroup.confirmEmail');
+
   }
   setMessage(c: AbstractControl): void {
     this.emailMessage = '';
     if ((c.touched || c.dirty) && c.errors) {
       this.emailMessage = Object.keys(c.errors)
-      .map(key => this.validationMessages[key]).join (' ');
+        .map(key => this.validationMessages[key])
+        .join(' ');
     }
   }
   populateTestData(): void {
